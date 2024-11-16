@@ -1,4 +1,4 @@
-module github.com/Owen-Choh/datetest
+module github.com/Owen-Choh/go_stuff/datetest
 
 go 1.21.5
 
