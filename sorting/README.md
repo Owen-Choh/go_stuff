@@ -1,4 +1,5 @@
 implementing some simple sorting
-make some tests too
+
+made some tests too
 
 also benchmarked mergesort using concurrency out of curiosity 
