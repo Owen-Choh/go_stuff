@@ -1,7 +1,6 @@
 package sort
 
 // QuickSort algorithm.
-// 
 func QuickSort(arr []int, low int, high int, asc bool) ([]int, int) {
 	if low >= high {
 		return arr, low
