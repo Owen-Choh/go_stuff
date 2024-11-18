@@ -59,4 +59,3 @@ I plan to work on in the future:
 - build a simple API and probably put it in a container
   - experiment with a db / HTTP requests
   - experiment more on concurrency
-- might try creating some packages / modules I can reuse.
