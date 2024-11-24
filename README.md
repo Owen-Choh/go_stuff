@@ -34,7 +34,7 @@ To get some remote package, will also update the go mod file
 
 Hack for local development, better not to do in production (put in the go.mod file)
 
-`replace github.com/Owen-Choh/mystrings v0.0.0 => ../mystrings`
+`replace github.com/Owen-Choh/go_stuff/mystrings v0.0.0 => ../mystrings`
 
 ### packages
 - "main" means you can build and run this file
@@ -54,7 +54,7 @@ some useful flags
   - example `go test -bench . -benchmem ./` run all benchmarks found in this directory and show the memory allocations too
 
 # Future plans
-I plan to work on in the future:
+Stuff I plan to work on in the future:
 
 - build a simple API and probably put it in a container
   - experiment with a db / HTTP requests
