@@ -57,5 +57,5 @@ some useful flags
 Stuff I plan to work on in the future:
 
 - build a simple API and probably put it in a container
-  - experiment more on concurrency
+- experiment more on concurrency
 - experiment with using a db
