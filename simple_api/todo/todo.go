@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -14,6 +15,9 @@ var Tasks []task
 func Init() {
 	fmt.Println("Initialise todo")
 	Tasks = []task{
+		{
+			detail: "Task number 1 goes here!",
+		},
 		{
 			detail: "Your task goes here!",
 		},
@@ -29,12 +33,22 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 func GetAllTasks(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("received request for all tasks")
 	// print out the task details
+	w.Write(getalltasks())
+}
+
+func getalltasks() []byte {
+	var output string
 	for i := 0; i < len(Tasks); i++ {
-		fmt.Fprintf(w, "Task number %d: %s", i, Tasks[i].detail)
+		output += fmt.Sprintf("Task number %d: %s", i, Tasks[i].detail)
 	}
+	return []byte(output)
 }
 
 func GetTask(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	w.Write([]byte("received request for task: " + id))
+	w.Write(gettask(id))
+}
+
+func gettask(id string) []byte {
+	return []byte("received request for task: " + id)
 }
