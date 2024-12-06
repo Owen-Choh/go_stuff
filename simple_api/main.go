@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/Owen-Choh/go_stuff/simple_api/todo"
 )
 
 func main()  {	
@@ -10,10 +12,7 @@ func main()  {
 	router := http.NewServeMux()
 
 	// sample route
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("received request at /")
-		fmt.Fprintf(w,"Hello world!")
-	})
+	router.HandleFunc("/", todo.HelloWorld)
 
 	// set server and start
 	server:= http.Server{
