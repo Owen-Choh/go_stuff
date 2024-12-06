@@ -3,25 +3,35 @@ package todo
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
-type task struct {
-	detail string
+type Task struct {
+	Detail string
 }
 
-var Tasks []task
+var Tasks []Task
 
 func Init() {
 	fmt.Println("Initialise todo")
-	Tasks = []task{
+	Tasks = []Task{
 		{
-			detail: "Task number 1 goes here!",
+			Detail: "Task number 1 goes here!",
 		},
 		{
-			detail: "Your task goes here!",
+			Detail: "Your task goes here!",
 		},
 	}
+}
+
+func Test(w http.ResponseWriter, r *http.Request) {
+	data, err := json.Marshal(Tasks)
+	if err != nil {
+		log.Fatalf("Error marshalling data to json: %v", Tasks)
+	}
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(data)
 }
 
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +49,7 @@ func GetAllTasks(w http.ResponseWriter, r *http.Request) {
 func getalltasks() []byte {
 	var output string
 	for i := 0; i < len(Tasks); i++ {
-		output += fmt.Sprintf("Task number %d: %s", i, Tasks[i].detail)
+		output += fmt.Sprintf("Task number %d: %s", i, Tasks[i].Detail)
 	}
 	return []byte(output)
 }
