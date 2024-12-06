@@ -26,10 +26,15 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello world!") 
 }
 
-func GetTasks(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("GetItem received request")
+func GetAllTasks(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("received request for all tasks")
 	// print out the task details
 	for i := 0; i < len(Tasks); i++ {
 		fmt.Fprintf(w, "Task number %d: %s", i, Tasks[i].detail)
 	}
+}
+
+func GetTask(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	w.Write([]byte("received request for task: " + id))
 }

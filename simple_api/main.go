@@ -15,7 +15,8 @@ func main()  {
 
 	// sample route
 	router.HandleFunc("/", todo.HelloWorld)
-	router.HandleFunc("/task", todo.GetTasks)
+	router.HandleFunc("/task/all", todo.GetAllTasks)
+	router.HandleFunc("/task/{id}", todo.GetTask)
 
 	// set server and start
 	server:= http.Server{
