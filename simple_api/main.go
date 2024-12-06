@@ -7,12 +7,15 @@ import (
 	"github.com/Owen-Choh/go_stuff/simple_api/todo"
 )
 
-func main()  {	
+func main()  {
+	todo.Init()
+
 	// HTTP request multiplexer to match url of requests
 	router := http.NewServeMux()
 
 	// sample route
 	router.HandleFunc("/", todo.HelloWorld)
+	router.HandleFunc("/task", todo.GetTasks)
 
 	// set server and start
 	server:= http.Server{
