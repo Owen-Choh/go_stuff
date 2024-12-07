@@ -25,8 +25,8 @@ func Init() {
 	}
 }
 
-func Test(w http.ResponseWriter, r *http.Request) {
-	data, err := json.Marshal(Tasks)
+func jsonResponse(w http.ResponseWriter, payload any) {
+	data, err := json.Marshal(payload)
 	if err != nil {
 		log.Fatalf("Error marshalling data to json: %v", Tasks)
 	}
