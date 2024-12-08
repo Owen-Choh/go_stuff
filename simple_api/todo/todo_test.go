@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
@@ -162,7 +163,7 @@ func TestCreateTask(t *testing.T) {
 			currentTaskList: []Task{{Detail: "first task"}},
 		},
 		{
-			name:            "Initial task",
+			name:            "Wrong http method",
 			requestMethod:   http.MethodGet,
 			requestPayload:  `{Detail: "first task"}`,
 			expectedCode:    http.StatusMethodNotAllowed,
@@ -192,7 +193,8 @@ func TestCreateTask(t *testing.T) {
 		if response.StatusCode != test.expectedCode {
 			t.Errorf("%s expected status code %d but received %d", test.name, test.expectedCode, response.StatusCode)
 		}
-
+		if !reflect.DeepEqual(Tasks, test.currentTaskList) {
+			t.Errorf("%s expected current task list %v but is %v", test.name, test.currentTaskList, Tasks)
+		}
 	}
-
 }
