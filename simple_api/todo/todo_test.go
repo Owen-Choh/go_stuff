@@ -68,10 +68,10 @@ func TestJsonResponse(t *testing.T) {
 
 func TestGetTaskByIndex(t *testing.T) {
 	type test struct {
-		name         string
-		requestPathvalue  string
-		expectedCode int
-		expectedBody string
+		name             string
+		requestPathvalue string
+		expectedCode     int
+		expectedBody     string
 	}
 	baseURL := "/task/"
 
@@ -86,61 +86,113 @@ func TestGetTaskByIndex(t *testing.T) {
 
 	tests := []test{
 		{
-			name:         "Valid index",
-			requestPathvalue:  "0",
-			expectedCode: http.StatusOK,
-			expectedBody: `{"Detail":"Number 1"}`,
+			name:             "Valid index",
+			requestPathvalue: "0",
+			expectedCode:     http.StatusOK,
+			expectedBody:     `{"Detail":"Number 1"}`,
 		},
 		{
-			name:         "Valid index",
-			requestPathvalue:  "1",
-			expectedCode: http.StatusOK,
-			expectedBody: `{"Detail":"Number 2"}`,
+			name:             "Valid index",
+			requestPathvalue: "1",
+			expectedCode:     http.StatusOK,
+			expectedBody:     `{"Detail":"Number 2"}`,
 		},
 		{
-			name:         "Negative index",
-			requestPathvalue:  "-1",
-			expectedCode: http.StatusBadRequest,
-			expectedBody: ``,
+			name:             "Negative index",
+			requestPathvalue: "-1",
+			expectedCode:     http.StatusBadRequest,
+			expectedBody:     ``,
 		},
 		{
-			name:         "Invalid index",
-			requestPathvalue:  "3",
-			expectedCode: http.StatusNotFound,
-			expectedBody: ``,
+			name:             "Invalid index",
+			requestPathvalue: "3",
+			expectedCode:     http.StatusNotFound,
+			expectedBody:     ``,
 		},
 		{
-			name:         "Non integer index",
-			requestPathvalue:  "hello",
-			expectedCode: http.StatusBadRequest,
-			expectedBody: ``,
+			name:             "Non integer index",
+			requestPathvalue: "hello",
+			expectedCode:     http.StatusBadRequest,
+			expectedBody:     ``,
 		},
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, func (t *testing.T){
-			request := httptest.NewRequest(http.MethodGet, baseURL + test.requestPathvalue, nil)
+		t.Run(test.name, func(t *testing.T) {
+			request := httptest.NewRequest(http.MethodGet, baseURL+test.requestPathvalue, nil)
 			request.SetPathValue("id", test.requestPathvalue)
 
 			w := httptest.NewRecorder()
 
-			GetTaskByIndex(w,request)
+			GetTaskByIndex(w, request)
 
 			response := w.Result()
 
 			if response.StatusCode != test.expectedCode {
-				t.Errorf("expected status code %d but received %d", test.expectedCode , response.StatusCode)
+				t.Errorf("expected status code %d but received %d", test.expectedCode, response.StatusCode)
 			}
 
 			responseBody, _ := io.ReadAll(response.Body)
 			if string(responseBody) != test.expectedBody {
-				t.Errorf("expected status code %s but received %s", test.expectedBody , string(responseBody))
+				t.Errorf("expected status code %s but received %s", test.expectedBody, string(responseBody))
 			}
 		})
 	}
 }
 
 func TestCreateTask(t *testing.T) {
+	type test struct {
+		name            string
+		requestMethod   string
+		requestPayload  string
+		expectedCode    int
+		expectedBody    string
+		currentTaskList []Task
+	}
+	baseURL := "/task/"
+
+	Tasks = []Task{}
+
+	tests := []test{
+		{
+			name:            "Initial task",
+			requestMethod:   http.MethodPost,
+			requestPayload:  `{Detail: "first task"}`,
+			expectedCode:    http.StatusCreated,
+			currentTaskList: []Task{{Detail: "first task"}},
+		},
+		{
+			name:            "Initial task",
+			requestMethod:   http.MethodGet,
+			requestPayload:  `{Detail: "first task"}`,
+			expectedCode:    http.StatusMethodNotAllowed,
+			currentTaskList: []Task{{Detail: "first task"}},
+		},
+		{
+			name:            "Empty task",
+			requestMethod:   http.MethodPost,
+			requestPayload:  `{Detail: ""}`,
+			expectedCode:    http.StatusNotAcceptable,
+			currentTaskList: []Task{{Detail: "first task"}},
+		},
+	}
+
+	for _, test := range tests {
+		var payload = []byte(test.requestPayload)
+
+		request := httptest.NewRequest(test.requestMethod, baseURL, bytes.NewBuffer(payload))
+		request.Header.Set("Content-Type", "application/json")
+
+		w := httptest.NewRecorder()
+
+		CreateTask(w, request)
+
+		response := w.Result()
+
+		if response.StatusCode != test.expectedCode {
+			t.Errorf("%s expected status code %d but received %d", test.name, test.expectedCode, response.StatusCode)
+		}
+
+	}
 
 }
-
