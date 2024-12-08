@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type Task struct {
@@ -41,24 +42,26 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAllTasks(w http.ResponseWriter, r *http.Request) {
+	// returns the all tasks details
 	fmt.Println("received request for all tasks")
-	// print out the task details
-	w.Write(getalltasks())
+
+	jsonResponse(w, Tasks)
 }
 
-func getalltasks() []byte {
-	var output string
-	for i := 0; i < len(Tasks); i++ {
-		output += fmt.Sprintf("Task number %d: %s", i, Tasks[i].Detail)
-	}
-	return []byte(output)
-}
+func GetTaskByIndex(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("received request for specific task")
 
-func GetTask(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
-	w.Write(gettask(id))
-}
+	index, err := strconv.Atoi(id)
+	if err != nil || index < 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	
+	if index >= len(Tasks) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 
-func gettask(id string) []byte {
-	return []byte("received request for task: " + id)
+	jsonResponse(w, Tasks[index])
 }

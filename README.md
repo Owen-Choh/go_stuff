@@ -49,6 +49,8 @@ Hack for local development, better not to do in production (put in the go.mod fi
 
 some useful flags
 - `-v` verbose message to see what test pass and fail, and logs even when test passes
+- `-run` run whichever function that matches the regex given
+  - example `go test ./... -run TestExample` run all tests named 'TestExample' found in this directory 
 - `-bench=.` or `-bench .` to run all benchmarks in this file
   - `-benchmem` if you want to see memory allocation
   - example `go test -bench . -benchmem ./` run all benchmarks found in this directory and show the memory allocations too
