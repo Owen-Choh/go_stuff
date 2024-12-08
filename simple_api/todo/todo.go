@@ -65,3 +65,9 @@ func GetTaskByIndex(w http.ResponseWriter, r *http.Request) {
 
 	jsonResponse(w, Tasks[index])
 }
+
+func CreateTask(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}

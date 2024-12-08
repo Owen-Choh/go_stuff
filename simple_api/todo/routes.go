@@ -10,6 +10,7 @@ func SetUpHttpMux() *http.ServeMux{
 	router.HandleFunc("/", HelloWorld)
 	router.HandleFunc("/task/all", GetAllTasks)
 	router.HandleFunc("/task/{id}", GetTaskByIndex)
+	router.HandleFunc("/task/{details}", CreateTask)
 
 	return router
 }
