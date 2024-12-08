@@ -144,7 +144,6 @@ func TestGetTaskByIndex(t *testing.T) {
 func TestCreateTask(t *testing.T) {
 	type test struct {
 		name            string
-		requestMethod   string
 		requestPayload  string
 		requestPathvalue string
 		expectedCode    int
