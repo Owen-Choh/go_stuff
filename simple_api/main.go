@@ -10,13 +10,7 @@ import (
 func main()  {
 	todo.Init()
 
-	// HTTP request multiplexer to match url of requests
-	router := http.NewServeMux()
-
-	// sample route
-	router.HandleFunc("/", todo.HelloWorld)
-	router.HandleFunc("/task/all", todo.GetAllTasks)
-	router.HandleFunc("/task/{id}", todo.GetTaskByIndex)
+	router := todo.SetUpHttpMux()
 
 	// set server and start
 	server:= http.Server{
