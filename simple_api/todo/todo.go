@@ -67,9 +67,10 @@ func GetTaskByIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateTask(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("received request to add task")
+	fmt.Printf("received request to add task %s\n", r.Method)
 
 	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
 
 	var inputTask Task
 

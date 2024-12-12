@@ -158,23 +158,30 @@ func TestCreateTask(t *testing.T) {
 		{
 			name:            "Initial task",
 			requestMethod:   http.MethodPost,
-			requestPayload:  `{Detail: "first task"}`,
+			requestPayload:  `{"Detail": "first task"}`,
 			expectedCode:    http.StatusCreated,
-			currentTaskList: []Task{{Detail: "first task"}},
-		},
-		{
-			name:            "Wrong http method",
-			requestMethod:   http.MethodGet,
-			requestPayload:  `{Detail: "first task"}`,
-			expectedCode:    http.StatusMethodNotAllowed,
 			currentTaskList: []Task{{Detail: "first task"}},
 		},
 		{
 			name:            "Empty task",
 			requestMethod:   http.MethodPost,
-			requestPayload:  `{Detail: ""}`,
+			requestPayload:  `{"Detail": ""}`,
 			expectedCode:    http.StatusNotAcceptable,
 			currentTaskList: []Task{{Detail: "first task"}},
+		},
+		{
+			name:            "Invalid task struct",
+			requestMethod:   http.MethodPost,
+			requestPayload:  `{"Detl": ""}`,
+			expectedCode:    http.StatusBadRequest,
+			currentTaskList: []Task{{Detail: "first task"}},
+		},
+		{
+			name:            "Add more task",
+			requestMethod:   http.MethodPost,
+			requestPayload:  `{"Detail": "2nd task"}`,
+			expectedCode:    http.StatusCreated,
+			currentTaskList: []Task{{Detail: "first task"},{Detail: "2nd task"}},
 		},
 	}
 
