@@ -67,7 +67,24 @@ func GetTaskByIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateTask(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+	fmt.Println("received request to add task")
+
+	decoder := json.NewDecoder(r.Body)
+
+	var inputTask Task
+
+	err := decoder.Decode(&inputTask)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
+
+	if inputTask.Detail == "" {
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	Tasks = append(Tasks, inputTask)
+
+	w.WriteHeader(http.StatusCreated)
 }
