@@ -147,7 +147,6 @@ func TestCreateTask(t *testing.T) {
 		requestMethod   string
 		requestPayload  string
 		expectedCode    int
-		expectedBody    string
 		currentTaskList []Task
 	}
 	baseURL := "/task/"
