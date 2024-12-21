@@ -182,6 +182,20 @@ func TestCreateTask(t *testing.T) {
 			expectedCode:    http.StatusCreated,
 			currentTaskList: []Task{{Detail: "first task"},{Detail: "2nd task"}},
 		},
+		{
+			name:            "Tasks in array",
+			requestMethod:   http.MethodPost,
+			requestPayload:  `[{"Detail": "2nd task"}]`,
+			expectedCode:    http.StatusBadRequest,
+			currentTaskList: []Task{{Detail: "first task"},{Detail: "2nd task"}},
+		},
+		{
+			name:            "Disallow multiple tasks",
+			requestMethod:   http.MethodPost,
+			requestPayload:  `[{"Detail": "1nd task"},{"Detail": "2nd task"}]`,
+			expectedCode:    http.StatusBadRequest,
+			currentTaskList: []Task{{Detail: "first task"},{Detail: "2nd task"}},
+		},
 	}
 
 	for _, test := range tests {
