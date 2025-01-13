@@ -13,14 +13,24 @@ func main()  {
 	router := todo.SetUpHttpMux()
 
 	router.HandleFunc("OPTIONS /cors", func(w http.ResponseWriter, r *http.Request){
-		fmt.Println("cors request")
+		fmt.Println("got cors options request")
 		fmt.Println(r.Header)
 		
 		w.Header().Add("Access-Control-Allow-Origin","*")
 		w.Header().Add("Access-Control-Allow-Methods","GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS")
 		w.Header().Add("Access-Control-Allow-Headers","Content-Type")
 		w.Header().Add("Access-Control-Max-Age","10000")
-		fmt.Fprint(w, "test cors request success")
+		fmt.Fprint(w, "test cors options request success")
+	})
+
+	router.HandleFunc("GET /cors", func(w http.ResponseWriter, r *http.Request){
+		fmt.Println("got cors GET request")
+		fmt.Println(r.Header)
+		w.Header().Add("Access-Control-Allow-Origin","*")
+		w.Header().Add("Access-Control-Allow-Methods","GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS")
+		w.Header().Add("Access-Control-Allow-Headers","Content-Type")
+		w.Header().Add("Access-Control-Max-Age","10000")
+		fmt.Fprint(w, "test cors get request success")
 	})
 
 	// set server and start
