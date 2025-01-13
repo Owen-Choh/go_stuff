@@ -1,0 +1,17 @@
+<h5>I LOVE CORS!</h5>
+<input type="submit" value="Start" onclick="submit()">
+
+<script type="text/javascript">
+    function submit() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                alert(xhr.response);
+            }
+        }
+        xhr.open('options', 'http://localhost:8080/cors', true);
+        // xhr.setRequestHeader('Origin', 'file:///C:/Users/Owen/Desktop/github_stuff/go_stuff/simple_api/index.html');
+        xhr.send();
+    }
+
+</script>
