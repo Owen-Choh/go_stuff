@@ -146,6 +146,7 @@ func TestCreateTask(t *testing.T) {
 		name            string
 		requestMethod   string
 		requestPayload  string
+		requestPathvalue string
 		expectedCode    int
 		currentTaskList []Task
 	}
@@ -156,67 +157,84 @@ func TestCreateTask(t *testing.T) {
 	tests := []test{
 		{
 			name:            "Initial task",
-			requestMethod:   http.MethodPost,
 			requestPayload:  `{"Detail": "first task"}`,
+			requestPathvalue: "0",
 			expectedCode:    http.StatusCreated,
 			currentTaskList: []Task{{Detail: "first task"}},
 		},
 		{
 			name:            "Empty task",
-			requestMethod:   http.MethodPost,
 			requestPayload:  `{"Detail": ""}`,
+			requestPathvalue: "0",
 			expectedCode:    http.StatusNotAcceptable,
 			currentTaskList: []Task{{Detail: "first task"}},
 		},
 		{
 			name:            "Invalid task struct",
-			requestMethod:   http.MethodPost,
 			requestPayload:  `{"Detl": ""}`,
+			requestPathvalue: "0",
 			expectedCode:    http.StatusBadRequest,
 			currentTaskList: []Task{{Detail: "first task"}},
 		},
 		{
 			name:            "Add more task",
-			requestMethod:   http.MethodPost,
 			requestPayload:  `{"Detail": "2nd task"}`,
+			requestPathvalue: "1",
 			expectedCode:    http.StatusCreated,
 			currentTaskList: []Task{{Detail: "first task"},{Detail: "2nd task"}},
 		},
 		{
 			name:            "Tasks in array",
-			requestMethod:   http.MethodPost,
 			requestPayload:  `[{"Detail": "2nd task"}]`,
+			requestPathvalue: "0",
 			expectedCode:    http.StatusBadRequest,
 			currentTaskList: []Task{{Detail: "first task"},{Detail: "2nd task"}},
 		},
 		{
 			name:            "Disallow multiple tasks",
-			requestMethod:   http.MethodPost,
 			requestPayload:  `[{"Detail": "1nd task"},{"Detail": "2nd task"}]`,
+			requestPathvalue: "0",
 			expectedCode:    http.StatusBadRequest,
 			currentTaskList: []Task{{Detail: "first task"},{Detail: "2nd task"}},
+		},
+		{
+			name:            "Add task at index larger than length",
+			requestPayload:  `{"Detail": "big task"}`,
+			requestPathvalue: "10",
+			expectedCode:    http.StatusCreated,
+			currentTaskList: []Task{{Detail: "first task"},{Detail: "2nd task"},{Detail: "big task"}},
+		},
+		{
+			name:            "Add task at negative index",
+			requestPayload:  `{"Detail": "negative task"}`,
+			requestPathvalue: "-1",
+			expectedCode:    http.StatusBadRequest,
+			currentTaskList: []Task{{Detail: "first task"},{Detail: "2nd task"},{Detail: "big task"}},
 		},
 	}
 
 	for _, test := range tests {
-		var payload = []byte(test.requestPayload)
+		t.Run(test.name, func(t *testing.T) {
+			var payload = []byte(test.requestPayload)
 
-		request := httptest.NewRequest(test.requestMethod, baseURL, bytes.NewBuffer(payload))
-		request.Header.Set("Content-Type", "application/json")
+			request := httptest.NewRequest(http.MethodPost, baseURL+test.requestPathvalue, bytes.NewBuffer(payload))
+			request.SetPathValue("taskId", test.requestPathvalue)
+			request.Header.Set("Content-Type", "application/json")
 
-		w := httptest.NewRecorder()
+			w := httptest.NewRecorder()
 
-		CreateTask(w, request)
+			CreateTaskAtIndex(w, request)
 
-		response := w.Result()
+			response := w.Result()
 
-		if response.StatusCode != test.expectedCode {
-			t.Errorf("%s expected status code %d but received %d", test.name, test.expectedCode, response.StatusCode)
-		}
-		// check if task is updated correctly
-		if !reflect.DeepEqual(Tasks, test.currentTaskList) {
-			t.Errorf("%s expected current task list %v but is %v", test.name, test.currentTaskList, Tasks)
-		}
+			if response.StatusCode != test.expectedCode {
+				t.Errorf("%s expected status code %d but received %d", test.name, test.expectedCode, response.StatusCode)
+			}
+			// check if task is updated correctly
+			if !reflect.DeepEqual(Tasks, test.currentTaskList) {
+				t.Errorf("%s expected current task list %v but is %v", test.name, test.currentTaskList, Tasks)
+			}
+		})
 	}
 }
 

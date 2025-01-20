@@ -35,19 +35,21 @@ func jsonResponse(w http.ResponseWriter, payload any) {
 	w.Write(data)
 }
 
+// hello world!
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("HelloWorld received request at /")
 	// write to the response which returns to client
 	fmt.Fprintf(w, "Hello world!") 
 }
 
+// returns the all tasks details
 func GetAllTasks(w http.ResponseWriter, r *http.Request) {
-	// returns the all tasks details
 	fmt.Println("received request for all tasks")
 
 	jsonResponse(w, Tasks)
 }
 
+// returns the task at the index
 func GetTaskByIndex(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("received request for specific task")
 
@@ -66,30 +68,7 @@ func GetTaskByIndex(w http.ResponseWriter, r *http.Request) {
 	jsonResponse(w, Tasks[index])
 }
 
-func CreateTask(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("received request to add task")
-
-	decoder := json.NewDecoder(r.Body)
-	decoder.DisallowUnknownFields()
-
-	var inputTask Task
-
-	err := decoder.Decode(&inputTask)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	if inputTask.Detail == "" {
-		w.WriteHeader(http.StatusNotAcceptable)
-		return
-	}
-
-	Tasks = append(Tasks, inputTask)
-
-	w.WriteHeader(http.StatusCreated)
-}
-
+// deletes task while keeping original order
 func DeleteTask(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("received request to delete task")
 
@@ -109,3 +88,44 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 	Tasks = append(Tasks[:index], Tasks[index + 1:]...)
 }
 
+// insert the task at the index specified, at end of list if index is too large
+func CreateTaskAtIndex(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("received request to add task at index")
+
+	// get the index from request
+	id := r.PathValue("taskId")
+	index, err := strconv.Atoi(id)
+	if err != nil || index < 0 {
+		fmt.Println("invalid index received")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	
+	if index > len(Tasks) {
+		index = len(Tasks)
+	}
+
+	// get the task to put into the list
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+
+	var inputTask Task
+
+	err = decoder.Decode(&inputTask)
+	if err != nil {
+		fmt.Println("invalid task received")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if inputTask.Detail == "" {
+		w.WriteHeader(http.StatusNotAcceptable)
+		return
+	}
+
+	Tasks = append(Tasks, Task{})
+	copy(Tasks[index+1:], Tasks[index:])
+	Tasks[index] = inputTask
+
+	w.WriteHeader(http.StatusCreated)
+}
