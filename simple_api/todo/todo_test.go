@@ -121,7 +121,7 @@ func TestGetTaskByIndex(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			request := httptest.NewRequest(http.MethodGet, baseURL+test.requestPathvalue, nil)
-			request.SetPathValue("id", test.requestPathvalue)
+			request.SetPathValue("taskId", test.requestPathvalue)
 
 			w := httptest.NewRecorder()
 
@@ -213,8 +213,88 @@ func TestCreateTask(t *testing.T) {
 		if response.StatusCode != test.expectedCode {
 			t.Errorf("%s expected status code %d but received %d", test.name, test.expectedCode, response.StatusCode)
 		}
+		// check if task is updated correctly
 		if !reflect.DeepEqual(Tasks, test.currentTaskList) {
 			t.Errorf("%s expected current task list %v but is %v", test.name, test.currentTaskList, Tasks)
 		}
 	}
 }
+
+func TestDeleteTask(t *testing.T) {
+	type test struct {
+		name             string
+		requestPathvalue string
+		expectedCode     int
+		currentTaskList []Task
+	}
+	baseURL := "/task/"
+
+	Tasks = []Task{
+		{
+			Detail: "Number 1",
+		},
+		{
+			Detail: "Number 2",
+		},
+		{
+			Detail: "Number 3",
+		},
+	}
+
+	tests := []test{
+		{
+			name:             "Valid index",
+			requestPathvalue: "0",
+			expectedCode:     http.StatusOK,
+			currentTaskList: []Task{{Detail: "Number 2"},{Detail: "Number 3"}},
+		},
+		{
+			name:             "Valid index",
+			requestPathvalue: "1",
+			expectedCode:     http.StatusOK,
+			currentTaskList: []Task{{Detail: "Number 2"}},
+		},
+		{
+			name:             "Negative index",
+			requestPathvalue: "-1",
+			expectedCode:     http.StatusBadRequest,
+			currentTaskList: []Task{{Detail: "Number 2"}},
+		},
+		{
+			name:             "Invalid index",
+			requestPathvalue: "3",
+			expectedCode:     http.StatusNotFound,
+			currentTaskList: []Task{{Detail: "Number 2"}},
+		},
+		{
+			name:             "Non integer index",
+			requestPathvalue: "hello",
+			expectedCode:     http.StatusBadRequest,
+			currentTaskList: []Task{{Detail: "Number 2"}},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			request := httptest.NewRequest(http.MethodDelete, baseURL+test.requestPathvalue, nil)
+			request.SetPathValue("taskId", test.requestPathvalue)
+
+			w := httptest.NewRecorder()
+
+			DeleteTask(w, request)
+
+			response := w.Result()
+
+			if response.StatusCode != test.expectedCode {
+				t.Errorf("expected status code %d but received %d", test.expectedCode, response.StatusCode)
+			}
+			
+			// check if task is updated correctly
+			if !reflect.DeepEqual(Tasks, test.currentTaskList) {
+				t.Errorf("%s expected current task list %v but is %v", test.name, test.currentTaskList, Tasks)
+			}
+		})
+	}
+}
+
+

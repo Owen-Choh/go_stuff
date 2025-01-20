@@ -51,7 +51,7 @@ func GetAllTasks(w http.ResponseWriter, r *http.Request) {
 func GetTaskByIndex(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("received request for specific task")
 
-	id := r.PathValue("id")
+	id := r.PathValue("taskId")
 	index, err := strconv.Atoi(id)
 	if err != nil || index < 0 {
 		w.WriteHeader(http.StatusBadRequest)
@@ -67,7 +67,7 @@ func GetTaskByIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateTask(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("received request to add task %s\n", r.Method)
+	fmt.Println("received request to add task")
 
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
@@ -89,3 +89,23 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 }
+
+func DeleteTask(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("received request to delete task")
+
+	requestedIndex := r.PathValue("taskId")
+	index, err := strconv.Atoi(requestedIndex)
+
+	if err != nil || index < 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	
+	if index >= len(Tasks) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	Tasks = append(Tasks[:index], Tasks[index + 1:]...)
+}
+
