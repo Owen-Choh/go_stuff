@@ -45,7 +45,7 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 // returns the all tasks details
 func GetAllTasks(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("received request for all tasks")
-
+	w.Header().Add("Access-Control-Allow-Origin","*")
 	jsonResponse(w, Tasks)
 }
 

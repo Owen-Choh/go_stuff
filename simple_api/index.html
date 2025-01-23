@@ -1,35 +1,151 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style>
+    .action {
+        display: flex;
+        flex-direction: column;
+        max-width: 100px;
+        min-width: 60px;
+    }
+
+    thead,
+    tfoot {
+    background-color: rgb(228 240 245);
+    }
+
+    th,
+    td {
+    border: 1px solid rgb(160 160 160);
+    padding: 8px 10px;
+    }
+
+    td:last-of-type {
+    text-align: center;
+    }
+
+    tbody > tr:nth-of-type(even) {
+    background-color: rgb(237 238 242);
+    }
+
+    tfoot th {
+    text-align: right;
+    }
+
+    tfoot td {
+    font-weight: bold;
+    }
+</style>
+
 <h5>I LOVE CORS!</h5>
 
-<div id="status" style="display: flex; align-items: center;">
-    <h5>Server up?</h5>
+<div id="status" style="display: flex; align-items: center; column-gap: 2px;">
+    <h5>Is the server up?</h5>
     <div id="status-color" style="height: 20px; width: 20px; background-color: grey;"></div>
+    <input type="button" value="Refresh" onclick="checkServerStatus()">
 </div>
 
-<input type="submit" value="Start" onclick="submit()">
+<div id="action-bar" style="display: flex; flex-wrap: wrap; column-gap: 2px; justify-content: space-around;">
+    <div class="action">
+        <input type="submit" value="Get all" 
+            onclick="submit('GET','/task/all')">
+    </div>
+    <div class="action">
+        <input type="submit" value="Search"
+            onclick="submit('GET','/task/'+document.getElementById('search-task-index')).value">
+        <div style="display: flex;">
+            <label for="">Index:</label>
+            <input id="search-task-index" style="max-width: 40px;" type="number" min="0" value="0">
+        </div>
+    </div>
+    <div class="action">
+        <input type="submit" value="Create"
+            onclick="submit('POST',
+                            '/task/'+document.getElementById('create-task-index').value,
+                            '{&quot;Detail&quot;: &quot;'+document.getElementById('create-task-details').value+'&quot;}')">
+        <div style="display: inline-flex; width: 100%;">
+            <label for="">Index:</label>
+            <input id="create-task-index" style="width: inherit;" type="number" min="0" value="0">
+        </div>
+        <textarea id="create-task-details" type="text" placeholder="Task details"></textarea>
+    </div>
+    <div class="action">
+        <input type="submit" value="Delete"
+            onclick="submit('DELETE',
+                            '/task/'+document.getElementById('delete-task-index').value)">
+        <div style="display: inline-flex; width: 100%;">
+            <label for="">Index:</label>
+            <input id="delete-task-index" style="width: inherit;" type="number" min="0" value="0">
+        </div>
+    </div>
+</div>
+
+<table id="task-table" style="border-color: black; border-style: solid; width: 100%; margin-top: 10px;">
+    <thead>
+        <tr>
+          <th scope="col">Result ID</th>
+          <th scope="col">Task Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <th scope="row">Chris</th>
+          <td>HTML tables</td>
+        </tr>
+        <tr>
+          <th scope="row">Dennis</th>
+          <td>Web accessibility</td>
+        </tr>
+        <tr>
+          <th scope="row">Sarah</th>
+          <td>JavaScript frameworks</td>
+        </tr>
+        <tr>
+          <th scope="row">Karen</th>
+          <td>Web performance</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row">Total Results</th>
+          <td>0</td>
+        </tr>
+      </tfoot>
+</table>
 
 <script type="text/javascript">
-    function submit() {
+    baseURL = 'http://localhost:8080';
+
+    function submit(method, endpoint, payload) {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
                 alert(xhr.response);
             }
         }
-        xhr.open('GET', 'http://localhost:8080/cors', true);
-        // xhr.setRequestHeader('Origin', 'file:///C:/Users/Owen/Desktop/github_stuff/go_stuff/simple_api/index.html');
+        xhr.open(method, baseURL+endpoint, true);
+        xhr.send(payload);
+    }
+
+    function checkServerStatus() {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status == 200) {
+                    document.getElementById("status-color").style.backgroundColor = "green";
+                } else {
+                    document.getElementById("status-color").style.backgroundColor = "red";
+                }
+            }
+        }
+        xhr.open('GET', baseURL+'/cors', true);
         xhr.send();
     }
 
-    function checkServer() {
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-                alert(xhr.response);
-            }
-        }
-        xhr.open('GET', 'http://localhost:8080/cors', true);
-        // xhr.setRequestHeader('Origin', 'file:///C:/Users/Owen/Desktop/github_stuff/go_stuff/simple_api/index.html');
-        xhr.send();
+    function displayTask(index, details) {
+        var x = document.getElementById("task-table");
+        var y = document.createElement('tr');
+        y.innerHTML = '<th scope="row">'+index+'</th><td>'+details+'</td>'
+        x.appendChild(y)
     }
-    window.onload()
+
+    window.addEventListener("load", checkServerStatus)
 </script>
